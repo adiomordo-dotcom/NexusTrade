@@ -9,10 +9,12 @@ interface TradeState {
     assetIds: string[];
     totalPortfolioValue: number;
     isLoading: boolean;
+    connectionStatus: 'connected' | 'disconnected' | 'connecting';
     // Actions
     setAssets: (assets: Asset[]) => void;
     updateAssetLiveFields: (symbol: string, liveData: Partial<LiveAsset>) => void;
     setLoading: (loading: boolean) => void;
+    setConnectionStatus: (status: 'connected' | 'disconnected' | 'connecting') => void;
 }
 
 export const useTradeStore = create<TradeState>((set) => ({
@@ -20,6 +22,7 @@ export const useTradeStore = create<TradeState>((set) => ({
     assetIds: [],
     totalPortfolioValue: 0,
     isLoading: false,
+    connectionStatus: 'disconnected',
     setAssets: (incomingAssets) => {
         ValuationEngine.getInstance().setSymbolMapping(incomingAssets);
         const assetRecord = incomingAssets.reduce((acc, asset) => {
@@ -49,4 +52,7 @@ export const useTradeStore = create<TradeState>((set) => ({
     setLoading: (loading) => {
         set({ isLoading: loading });
     },
+    setConnectionStatus: (status) => {
+        set({ connectionStatus: status });
+    }
 }));
