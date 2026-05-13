@@ -57,6 +57,7 @@ class MockSocketService {
     public start(assets: Asset[]): void {
         ValuationEngine.getInstance().setSymbolMapping(assets);
         assets.forEach(asset => {
+            console.log(`Seeding ${asset.symbol} with ${asset.purchasePrice}`);
             this.prices.set(asset.symbol, asset.purchasePrice);
         });
         this.startMocking();
@@ -64,8 +65,12 @@ class MockSocketService {
 
     private generateUpdate(symbol: string): void {
         const currentPrice = this.prices.get(symbol) || 0;
+        if (currentPrice === 0) {
+            console.warn(`Price for ${symbol} is 0. Check seeding logic.`);
+        }
         const changePercent = 1 + (Math.random() - 0.5) * 0.004;
         const nextPrice = currentPrice * changePercent;
+        console.log(`[Mock] ${symbol}: ${currentPrice.toFixed(2)} -> ${nextPrice.toFixed(2)}`);
         this.prices.set(symbol, nextPrice);
         ValuationEngine.getInstance().processUpdate(symbol, nextPrice);
     }

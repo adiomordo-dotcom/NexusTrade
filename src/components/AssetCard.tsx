@@ -1,21 +1,36 @@
-import React, { useEffect } from 'react';
+import React, { memo } from 'react';
 import { View, Text, StyleSheet } from 'react-native';
+import { useTradeStore } from '../store/useTradeStore';
 
 interface AssetCardProps {
-    symbol: string;
-    price: number;
+    id: string;
 }
 
-function AssetCard({ symbol, price }: AssetCardProps) {
+function AssetCard({ id }: AssetCardProps) {
+    const asset = useTradeStore(state => state.assets[id]);
+    if (!asset) return null;
+
+    const positivePnl = asset.pnl >= 0;
+
     return (
         <View style={styles.assetContainer}>
-            <Text style={styles.assetName}>{symbol}</Text>
-            <Text style={styles.assetPrice}>${price.toFixed(2)}</Text>
+            <View>
+                <Text style={styles.symbol}>{asset.symbol}</Text>
+                <Text style={styles.name}>{asset.name}</Text>
+            </View>
+            <View style={styles.rightColumn}>
+                <Text style={[styles.price, { fontVariant: ['tabular-nums'] }]}>
+                    ${asset.currentPrice.toFixed(2)}
+                </Text>
+                <Text style={{ color: positivePnl ? '#4CD964' : '#FF3B30' }}>
+                    {positivePnl ? '+' : ''}${asset.pnl.toFixed(2)}
+                </Text>
+            </View>
         </View>
     );
 }
 
-export default AssetCard;
+export default memo(AssetCard);
 
 const styles = StyleSheet.create({
     assetContainer: {
@@ -38,5 +53,20 @@ const styles = StyleSheet.create({
     assetPrice: {
         fontSize: 18,
         color: '#888',
+    },
+    symbol: {
+        fontSize: 16,
+        fontWeight: 'bold',
+    },
+    name: {
+        fontSize: 14,
+        color: '#666',
+    },
+    rightColumn: {
+        alignItems: 'flex-end',
+    },
+    price: {
+        fontSize: 18,
+        fontWeight: 'bold',
     },
 });

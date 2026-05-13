@@ -5,7 +5,6 @@ import { calculateTrend, calculateVolatility } from "../utils/finance";
 class ValuationEngine {
     private static instance: ValuationEngine;
     private priceBuffers: Map<string, number[]> = new Map();
-    private symbolToIdMap: Map<string, string> = new Map();
 
     private constructor() {
     }
@@ -18,22 +17,19 @@ class ValuationEngine {
     }
 
     public processUpdate(symbol: string, price: number): void {
-        const id = this.symbolToIdMap.get(symbol);
-        if (!id) return;
-
-        const buffer = this.priceBuffers.get(id) || [];
+        const buffer = this.priceBuffers.get(symbol) || [];
         buffer.push(price);
         if (buffer.length > 5) buffer.shift();
-        this.priceBuffers.set(id, buffer);
+        this.priceBuffers.set(symbol, buffer);
 
-        const asset = useTradeStore.getState().assets[id];
+        const asset = useTradeStore.getState().assets[symbol];
         if (!asset) return;
 
         const trend = calculateTrend(buffer);
         const volatility = calculateVolatility(buffer);
         const pnl = (price - asset.purchasePrice) * asset.amount;
 
-        useTradeStore.getState().updateAssetLiveFields(id, {
+        useTradeStore.getState().updateAssetLiveFields(symbol, {
             currentPrice: price,
             pnl,
             volatility,
@@ -42,7 +38,7 @@ class ValuationEngine {
     }
 
     public setSymbolMapping(assets: Asset[]) {
-        assets.forEach(a => this.symbolToIdMap.set(a.symbol, a.id));
+        this.priceBuffers.clear();
     }
 }
 

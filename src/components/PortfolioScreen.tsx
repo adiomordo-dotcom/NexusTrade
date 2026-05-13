@@ -1,45 +1,39 @@
-import React, { useCallback, useEffect } from 'react';
-import { View, ActivityIndicator, Text, StyleSheet, FlatList } from 'react-native';
+import React, { useCallback } from 'react';
+import { View, ActivityIndicator, Text, StyleSheet, FlatList, } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
 import { useTradeStore } from '../store/useTradeStore';
 import { useInitializePortfolio } from '../hooks';
 import AssetCard from './AssetCard';
 
+const LoadingScreen = (style: any) => (
+    <View style={style}>
+        <ActivityIndicator size="large" color="#8989ca" />
+    </View>
+);
 
 function PortfolioScreen() {
     useInitializePortfolio();
 
-    const assets = useTradeStore(state => state.assets);
+    const assetIds = useTradeStore(state => state.assetIds);
     const isLoading = useTradeStore(state => state.isLoading);
 
-    const LoadingScreen = () => (
-        <View style={styles.container}>
-            <Text style={styles.title}>Loading...</Text>
-            <ActivityIndicator size="large" color="#0000ff" />
-        </View>
-    )
-
     const renderItem = useCallback(({ item }: { item: any }) => (
-        <AssetCard symbol={item.symbol} price={item.currentPrice} />
+        <AssetCard id={item} />
     ), []);
-
-    const AssetsList = () => (
-        <View>
-            <Text style={styles.title}>Portfolio Screen</Text>
-            <FlatList
-                data={Object.values(assets)}
-                keyExtractor={(item) => item.symbol}
-                renderItem={renderItem}
-            />
-        </View>
-
-    )
 
     return (
         <SafeAreaView style={styles.container}>
             {isLoading ?
-                <LoadingScreen /> :
-                <AssetsList />
+                <LoadingScreen style={styles.container} /> :
+                <View>
+                    <Text style={styles.title}>Portfolio Screen</Text>
+                    <FlatList
+                        data={assetIds}
+                        keyExtractor={(item) => item.toString()}
+                        renderItem={renderItem}
+                        showsVerticalScrollIndicator={false}
+                    />
+                </View>
             }
         </SafeAreaView>
     )
