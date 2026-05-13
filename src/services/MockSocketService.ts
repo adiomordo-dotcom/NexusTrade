@@ -1,6 +1,6 @@
 import { useTradeStore } from "../store/useTradeStore";
-import { LiveAsset, Asset } from "../types";
-import ValuationEngine from './valuationEngine';
+import { Asset } from "../types";
+import ValuationEngine from './ValuationEngine';
 
 class MockSocketService {
     private static instance: MockSocketService;
@@ -55,6 +55,7 @@ class MockSocketService {
     }
 
     public start(assets: Asset[]): void {
+        ValuationEngine.getInstance().setSymbolMapping(assets);
         assets.forEach(asset => {
             this.prices.set(asset.symbol, asset.purchasePrice);
         });
@@ -69,3 +70,5 @@ class MockSocketService {
         ValuationEngine.getInstance().processUpdate(symbol, nextPrice);
     }
 }
+
+export default MockSocketService;

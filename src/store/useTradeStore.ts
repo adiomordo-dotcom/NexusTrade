@@ -1,5 +1,5 @@
 import { create } from 'zustand';
-import ValuationEngine from '../services/valuationEngine';
+import { ValuationEngine } from '../services';
 import { Asset, LiveAsset } from '../types';
 
 type MappedAsset = Record<string, LiveAsset>;
