@@ -1,4 +1,4 @@
-import { calculateTrend, calculateVolatility, calculatePNL } from '../finance';
+import { calculateTrend, calculateVolatility, calculatePNL, calculateTotalValue } from '../finance';
 
 describe('Finance Utils', () => {
     describe('calculateTrend', () => {
@@ -42,6 +42,20 @@ describe('Finance Utils', () => {
             expect(calculatePNL(110, 100, 10)).toBe(100);
             expect(calculatePNL(90, 100, 10)).toBe(-100);
             expect(calculatePNL(100, 100, 10)).toBe(0);
+        });
+    });
+
+    describe('calculateTotalValue', () => {
+        it('should calculate total value of assets', () => {
+            const assets = {
+                'AAPL': { id: '1', symbol: 'AAPL', name: 'Apple', currentPrice: 150, amount: 10, purchasePrice: 140 },
+                'GOOG': { id: '2', symbol: 'GOOG', name: 'Google', currentPrice: 2000, amount: 5, purchasePrice: 1900 },
+            };
+            expect(calculateTotalValue(assets)).toBe(150 * 10 + 2000 * 5);
+        });
+
+        it('should return 0 when there are no assets', () => {
+            expect(calculateTotalValue({})).toBe(0);
         });
     });
 });

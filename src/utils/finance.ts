@@ -1,4 +1,4 @@
-import { Trend, Volatility } from '../types';
+import { LiveAsset, Trend, Volatility } from '../types';
 
 export const calculateTrend = (prices: number[]): Trend => {
     if (prices.length < 2) return 'neutral';
@@ -20,4 +20,10 @@ export const calculateVolatility = (prices: number[]): Volatility => {
 
 export const calculatePNL = (currentPrice: number, purchasePrice: number, amount: number): number => {
     return (currentPrice - purchasePrice) * amount;
+};
+
+export const calculateTotalValue = (assets: Record<string, LiveAsset>): number => {
+    return Object.values(assets).reduce((total, asset) => {
+        return total + (asset.currentPrice * asset.amount);
+    }, 0);
 };

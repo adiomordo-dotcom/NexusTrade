@@ -16,22 +16,31 @@ function PortfolioScreen() {
 
     const assetIds = useTradeStore(state => state.assetIds);
     const isLoading = useTradeStore(state => state.isLoading);
+    const totalValue = useTradeStore(state => state.totalPortfolioValue);
 
     const renderItem = useCallback(({ item }: { item: any }) => (
         <AssetCard id={item} />
     ), []);
+
+    const headerComponent = useCallback(() => (
+        <View style={styles.container}>
+            <Text style={styles.title}>Portfolio Screen</Text>
+            <Text style={styles.totalValue}>Total Value: ${totalValue.toFixed(2)}</Text>
+        </View>
+    ), [totalValue]);
 
     return (
         <SafeAreaView style={styles.container}>
             {isLoading ?
                 <LoadingScreen style={styles.container} /> :
                 <View>
-                    <Text style={styles.title}>Portfolio Screen</Text>
                     <FlatList
                         data={assetIds}
+                        ListHeaderComponent={headerComponent}
                         keyExtractor={(item) => item.toString()}
                         renderItem={renderItem}
                         showsVerticalScrollIndicator={false}
+                        stickyHeaderIndices={[0]}
                     />
                 </View>
             }
@@ -47,10 +56,16 @@ const styles = StyleSheet.create({
         backgroundColor: '#b6c2cc',
         padding: 20
     },
+    totalValue: {
+        fontSize: 14,
+        fontWeight: '600',
+        marginBottom: 10,
+        textAlign: 'center',
+    },
     title: {
         fontSize: 24,
         fontWeight: 'bold',
-        marginBottom: 20,
+        marginBottom: 10,
         textAlign: 'center',
 
     },

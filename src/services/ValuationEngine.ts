@@ -1,12 +1,14 @@
 import { useTradeStore } from "../store/useTradeStore";
 import { Asset } from "../types";
-import { calculateTrend, calculateVolatility } from "../utils/finance";
+import { calculateTrend, calculateVolatility, calculateTotalValue } from "../utils/finance";
 
 class ValuationEngine {
     private static instance: ValuationEngine;
     private priceBuffers: Map<string, number[]> = new Map();
+    private heartbeatId: ReturnType<typeof setInterval> | null = null;
 
     private constructor() {
+        this.startHeartbeat();
     }
 
     public static getInstance(): ValuationEngine {
@@ -39,6 +41,25 @@ class ValuationEngine {
 
     public setSymbolMapping(assets: Asset[]) {
         this.priceBuffers.clear();
+    }
+
+    private startHeartbeat(): void {
+        this.heartbeatId = setInterval(() => {
+            this.calculateAndSyncTotal();
+        }, 1000);
+    }
+
+    public stop() {
+        if (this.heartbeatId) {
+            clearInterval(this.heartbeatId);
+            this.heartbeatId = null;
+        }
+    }
+
+    private calculateAndSyncTotal() {
+        const state = useTradeStore.getState();
+        const total = calculateTotalValue(state.assets);
+        useTradeStore.setState({ totalPortfolioValue: total });
     }
 }
 
